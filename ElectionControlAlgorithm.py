@@ -4,20 +4,25 @@ import LazyGreedy
 import MILP
 import numpy as np
 
-networks = ['netscience']
-is_constructive_params = [False]
-instances = 30
-num_mc_samples = 10
-r = 10
-p = .1
-C = [5, 10]
-k = [25]
+networks = ['synthetic']
+is_constructive_params = [True]
+instances = 1
+num_mc_samples = 100
+r = 100
+C = [2]
+k = [2]
 optimal_candidate = 0
 
 
 res = {}
 for network in networks:
-    G = nx.read_gml(network + ".gml")
+    if network in ["polblogs", "netscience", "synthetic"]:
+        G = nx.read_gml(network + ".gml")
+    else:
+        if network == "irvine":
+            G = nx.read_adjlist(network + ".txt", comments="%")
+        else:
+            G = nx.read_adjlist(network, comments="%")
     for is_constructive in is_constructive_params:
         for candidate in C:
             print("Working on " + network + " with C = " + str(candidate))

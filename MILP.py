@@ -75,7 +75,7 @@ def milp_mov_destructive(G, C, r, mc_samples, k, optimal_candidate):
     print("Solving the LP")
     prob.writeLP("MaxMOV.lp")
     #prob.solve(pulp.PULP_CBC_CMD(maxSeconds=1000))
-    prob.solve(pulp.CPLEX_PY(timeLimit=100, epgap=.1))
+    prob.solve(pulp.CPLEX_PY(timeLimit=1000, epgap=.01))
     seed_nodes = []
     for v in prob.variables():
         if v.varValue == 1 and "seed" in v.name:
@@ -109,7 +109,7 @@ def milp_mov_constructive(G, C, r, mc_samples, k, optimal_candidate):
     prob += (1/len(samples))*lpSum([m_c[i] for i in samples])
 
     # define constraints
-    prob += lpSum(s_v[i] for i in nodes) == k, "Seed Node Constraint"
+    prob += lpSum(s_v[i] for i in nodes) <= k, "Seed Node Constraint"
     for s in range(0, len(mc_samples)):
         for i in nodes:
             prob += x_v[s][i] <= lpSum(s_v[j] for j in mc_samples[s][i]["ancestors"]), "x_" + str(s) + "_" + str(i) + "constraint"
@@ -120,7 +120,7 @@ def milp_mov_constructive(G, C, r, mc_samples, k, optimal_candidate):
 
     print("Solving the LP")
     prob.writeLP("MaxMOV.lp")
-    prob.solve(CPLEX_PY(timeLimit=100, epgap=.1))
+    prob.solve(CPLEX_PY(timeLimit=1000, epgap=.01))
     seed_nodes = []
     for v in prob.variables():
         if v.varValue == 1 and "seed" in v.name:

@@ -16,10 +16,15 @@ def assign_random_voting_preferences(G, C):
         G.nodes[v]["voting_preference"] = candidates
 
 
+def assign_voting_preferences(G, C):
+    for v in G.nodes:
+        candidates = list(np.arange(C))[::-1]
+        G.nodes[v]["voting_preference"] = candidates
+
+
 def create_mc_samples(G, p, num_mc_samples, r, optimal_candidate, is_constructive):
     mc_samples = []
     for i in np.arange(0, num_mc_samples):
-        #print(i)
         sample = create_empty_copy(G)
         edges = np.asarray(G.edges)
         random_edges = edges[np.where(np.random.rand(len(edges)) < p)]
@@ -38,9 +43,12 @@ def create_mc_samples(G, p, num_mc_samples, r, optimal_candidate, is_constructiv
     return mc_samples
 
 
-def preprocess_data(G, C, p, num_mc_samples, r, optimal_candidate, instance, is_constructive, network):
+def preprocess_data(G, C, p, num_mc_samples, r, optimal_candidate, instance, is_constructive, network, is_synthetic = False):
     index_nodes(G)
-    assign_random_voting_preferences(G, C)
+    if is_synthetic:
+        assign_voting_preferences(G, C)
+    else:
+        assign_random_voting_preferences(G, C)
     mc_samples = create_mc_samples(G, p, num_mc_samples, r, optimal_candidate, is_constructive)
 
     with open('544tFinalProjectData/' + network + '/' + ('constructive' if is_constructive else 'destructive') + '/C_' + str(C) + '/compressed_mc_samples_' + str(C) + '_' + str(instance) +'.pkl', 'wb') as f:
